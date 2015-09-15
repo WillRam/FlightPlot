@@ -56,13 +56,17 @@ public class LogInfo {
                     "Start Time", startTimeStr});
             infoTableModel.addRow(new Object[]{"Updates count", logReader.getSizeUpdates()});
             Map<String, Object> ver = logReader.getVersion();
-            infoTableModel.addRow(new Object[]{"Hardware Version", ver.get("HW")});
-            infoTableModel.addRow(new Object[]{"Firmware Version", ver.get("FW")});
+            if (!ver.isEmpty()) {
+                infoTableModel.addRow(new Object[]{"Hardware Version", ver.get("HW")});
+                infoTableModel.addRow(new Object[]{"Firmware Version", ver.get("FW")});
+            }
             Map<String, Object> parameters = logReader.getParameters();
-            List<String> keys = new ArrayList<String>(parameters.keySet());
-            Collections.sort(keys);
-            for (String key : keys) {
-                parametersTableModel.addRow(new Object[]{key, parameters.get(key).toString()});
+            if (parameters != null) {
+                List<String> keys = new ArrayList<String>(parameters.keySet());
+                Collections.sort(keys);
+                for (String key : keys) {
+                    parametersTableModel.addRow(new Object[]{key, parameters.get(key).toString()});
+                }
             }
         }
     }
