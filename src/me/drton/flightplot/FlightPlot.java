@@ -919,10 +919,17 @@ public class FlightPlot {
     }
 
     private void generateSeries() throws IOException, FormatErrorException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        boolean fullHist = false;
         activeProcessors.clear();
         for (int row = 0; row < processorsListModel.getRowCount(); row++) {
             if ((Boolean) processorsListModel.getValueAt(row, 0)) {
-                activeProcessors.add((ProcessorPreset) processorsListModel.getValueAt(row, 1));
+                ProcessorPreset p = (ProcessorPreset) processorsListModel.getValueAt(row, 1);
+                activeProcessors.add(p);
+                //
+                if(p.getProcessorType().equals("Integral")) {
+                    fullHist = true;
+                }
+
             }
         }
 
@@ -935,9 +942,14 @@ public class FlightPlot {
 
         // Displayed log range in seconds of native log time
         Range range = getLogRange(timeMode);
-
-        // Process some extra data in hidden areas
-        long timeStart = (long) ((range.getLowerBound() - range.getLength()) * 1e6);
+        //If a series relies on previous states, start at the beginning of the log
+        long timeStart;
+        if (fullHist) {
+            timeStart = 0;
+        } else {
+        // Process some extra data in hidden areas 
+            timeStart = (long) ((range.getLowerBound() - range.getLength()) * 1e6);
+        }
         long timeStop = (long) ((range.getUpperBound() + range.getLength()) * 1e6);
         timeStart = Math.max(logReader.getStartMicroseconds(), timeStart);
         timeStop = Math.min(logReader.getStartMicroseconds() + logReader.getSizeMicroseconds(), timeStop);
